@@ -1,0 +1,64 @@
+name: BiTGApps Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' 
+
+env:
+  TOKEN: ${{ secrets.TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+       - name: Initial Setup
+         run: |
+           rm -rf BiTGApps
+
+       - name: Create BiTGApps
+         run: |
+           mkdir BiTGApps
+
+       - name: Clone Build Sources
+         run: |
+            git clone https://github.com/BiTGApps/BiTGApps-Build BiTGApps
+            git clone https://github.com/BiTGApps/BiTGApps BiTGApps/BiTGApps
+
+       - name: Clone Build Tools
+         run: |
+            git clone https://github.com/BiTGApps/Build-Tools BiTGApps/Build-Tools
+
+       - name: Create Sources
+         run: |
+           mkdir BiTGApps/sources
+
+       - name: Clone Package Sources
+         run: |
+            git clone https://github.com/BiTGApps/arm-sources BiTGApps/sources/arm-sources
+            git clone https://github.com/BiTGApps/arm64-sources BiTGApps/sources/arm64-sources
+            git clone https://github.com/BiTGApps/aosp-sources BiTGApps/sources/aosp-sources
+            git clone https://github.com/BiTGApps/setup-sources BiTGApps/sources/setup-sources
+            git clone https://github.com/BiTGApps/addon-sources BiTGApps/sources/addon-sources
+            git clone https://github.com/BiTGApps/microG-sources BiTGApps/sources/microG-sources
+
+       - name: Build BiTGApps Package
+         run: |
+            cd BiTGApps
+            . scripts/env_vars.sh
+            make
+            cd ..
+
+       - name: Github Release CLI
+         run: |
+            npm install -g github-release-cli
+
+       - name: Upload Build Artifact
+         run: |
+            cd BiTGApps
+            . scripts/env_vars.sh
+            ./upload_sources.sh arm
+            ./upload_sources.sh arm64
+            ./upload_sources.sh common
+            cd ..
