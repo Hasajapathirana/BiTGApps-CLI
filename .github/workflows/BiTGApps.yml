@@ -30,6 +30,10 @@ jobs:
          run: |
             git clone https://github.com/BiTGApps/Build-Tools BiTGApps/Build-Tools
 
+       - name: Clone Package Tools
+         run: |
+            git clone https://github.com/BiTGApps/BiTGApps-Tools BiTGApps/BiTGApps-Tools
+
        - name: Create Sources
          run: |
            mkdir BiTGApps/sources
@@ -58,7 +62,5 @@ jobs:
          run: |
             cd BiTGApps
             . scripts/env_vars.sh
-            ./upload_sources.sh arm
-            ./upload_sources.sh arm64
-            ./upload_sources.sh common
+            . artifacts.sh
             cd ..
